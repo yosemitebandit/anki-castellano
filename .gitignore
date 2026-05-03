@@ -1,0 +1,7 @@
+.env
+images/
+*.apkg
+*.json
+__pycache__/
+.venv/
+dist/
