@@ -68,7 +68,6 @@ def main() -> None:
         metavar="FILE",
         help="Vocab JSON files whose words to avoid (prevents repeats across decks)",
     )
-    parser.add_argument("--api-key", metavar="KEY", help="Gemini API key (overrides GEMINI_API_KEY env var)")
     args = parser.parse_args()
 
     if args.count % 4 != 0:
@@ -80,7 +79,7 @@ def main() -> None:
         exclude_files.append(args.file)
     existing_words = collect_existing_words(exclude_files)
 
-    client = make_client(args.api_key)
+    client = make_client()
 
     topic_clause = f" Focus on the theme: {args.topic}." if args.topic else ""
     avoid_clause = (
