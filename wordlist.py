@@ -24,6 +24,7 @@ Rules:
 - Practical words and concepts to help with day-to-day fluency and conversation.
 - Intermediate-to-advanced vocabulary (B2–C1 level). Words like sliding, doorstop, earlobe, bookshelf
 and not beach, mountain, dog, apple.
+- For adjectives, pick one form (masculine OR feminine). Never use slash notation like "efímero/a".
 - Varied topics unless a theme is specified.
 - Raw JSON only — no markdown, no code fences, no explanation.
 """
