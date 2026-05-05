@@ -15,7 +15,10 @@ You are a language curriculum designer. Generate a vocabulary list for an Anki f
 Output ONLY a valid JSON array. Each element is an array of exactly 4 strings:
   [0] The target-language word or short phrase — for nouns, omit the article (write "resiliencia" not "la resiliencia")
   [1] The English translation — for nouns, include the article to convey gender (write "la resiliencia" or "the resilience (f.)")
-  [2] A cloze sentence in the target language using _______ as the blank (natural, moderately challenging)
+  [2] A cloze sentence in the target language using _______ as the blank. Follow the N+1 principle:
+      the sentence grammar and all other vocabulary should be simple and common (A2–B1 level) so a
+      learner can understand the sentence even without knowing the target word — the blank is the only
+      challenging element.
   [3] A vivid image generation prompt in English: clear, unambiguous, single subject.
       If the word refers to a part of a larger object, add "Draw a thick red arrow pointing to [part]."
 
@@ -98,7 +101,7 @@ def main() -> None:
     print(f"Generating {desc}…")
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.1-pro-preview",
         contents=[prompt],
         config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
     )
