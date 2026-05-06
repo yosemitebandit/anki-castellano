@@ -13,6 +13,7 @@ CARD_CSS = """
                background-color: #121212; color: #f8f9fa; padding: 20px; }
 .cloze       { font-weight: bold; color: #3498db; }
 .translation { font-size: 20px; color: #95a5a6; margin-top: 10px; }
+.sentence-en { font-size: 16px; color: #7f8c8d; margin-top: 6px; font-style: italic; }
 img          { max-width: 320px; border-radius: 6px; margin-top: 15px; }
 """
 
@@ -27,8 +28,9 @@ def make_model() -> genanki.Model:
         model_type=genanki.Model.CLOZE,
         fields=[
             {"name": "Text"},  # cloze sentence: "...{{c1::word}}..."
-            {"name": "Translation"},  # shown on back
+            {"name": "Translation"},  # word translation, shown on back
             {"name": "Image"},  # shown on back, empty string if no image
+            {"name": "SentenceTranslation"},  # English sentence, shown on back
         ],
         templates=[
             {
@@ -42,6 +44,7 @@ def make_model() -> genanki.Model:
                     "{{Image}}</div>"
                     "{{/Image}}"
                     '<div class="translation">{{Translation}}</div>'
+                    '<div class="sentence-en">{{SentenceTranslation}}</div>'
                 ),
             }
         ],
@@ -80,7 +83,7 @@ def main() -> None:
 
     with_images = 0
     for entry in vocab:
-        word, translation, sentence, _ = entry
+        word, translation, sentence, _, sentence_en = (*entry, "")[:5]
         cloze_text = sentence.replace("_______", f"{{{{c1::{word}}}}}")
 
         img_path = image_dir / f"{word.lower().replace(' ', '_').replace('/', '_')}.png"
@@ -91,7 +94,7 @@ def main() -> None:
         else:
             img_field = ""
 
-        deck.add_note(genanki.Note(model=model, fields=[cloze_text, translation, img_field]))
+        deck.add_note(genanki.Note(model=model, fields=[cloze_text, translation, img_field, sentence_en]))
 
     pkg = genanki.Package(deck)
     pkg.media_files = media_files
