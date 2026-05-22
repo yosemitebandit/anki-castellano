@@ -3,6 +3,8 @@
 
 import argparse
 import concurrent.futures
+import hashlib
+import json
 import random
 import sys
 import wave
@@ -19,6 +21,8 @@ VOICES = [
     "Vindemiatrix", "Sadachbia", "Sadaltager", "Sulafat",
 ]
 
+MANIFEST = ".manifest.json"
+
 
 def word_to_filename(word: str) -> str:
     return word.lower().replace(" ", "_").replace("/", "_")
@@ -30,6 +34,10 @@ def save_wav(path: Path, pcm: bytes) -> None:
         wf.setsampwidth(2)
         wf.setframerate(24000)
         wf.writeframes(pcm)
+
+
+def sentence_hash(sentence: str) -> str:
+    return hashlib.sha256(sentence.encode()).hexdigest()[:16]
 
 
 def generate_audio(sentence: str, client) -> bytes | None:
@@ -53,25 +61,28 @@ def generate_audio(sentence: str, client) -> bytes | None:
         return None
 
 
-def process_entry(entry: list, audio_dir: Path, client) -> bool:
+def process_entry(entry: list, audio_dir: Path, client, manifest: dict) -> tuple[bool, str, str | None]:
+    """Returns (success, word, new_hash) — new_hash is None on a cache hit or failure."""
     word = entry[0]
     sentence2 = entry[5] if len(entry) > 5 else ""
     if not sentence2:
         print(f"  ⚠   No second sentence for '{word}' — regenerate vocab to get one")
-        return False
-
-    path = audio_dir / f"{word_to_filename(word)}.wav"
-    if path.exists():
-        print(f"  ♻   Cached: {word}")
-        return True
+        return False, word, None
 
     sentence_full2 = sentence2.replace("_______", word)
+    h = sentence_hash(sentence_full2)
+    path = audio_dir / f"{word_to_filename(word)}.wav"
+
+    if path.exists() and manifest.get(word) == h:
+        print(f"  ♻   Cached: {word}")
+        return True, word, None
+
     print(f"  🔊  Generating: {word}")
     pcm = generate_audio(sentence_full2, client)
     if pcm:
         save_wav(path, pcm)
-        return True
-    return False
+        return True, word, h
+    return False, word, None
 
 
 def main() -> None:
@@ -91,14 +102,23 @@ def main() -> None:
     audio_dir = Path(args.dir)
     audio_dir.mkdir(parents=True, exist_ok=True)
 
+    manifest_path = audio_dir / MANIFEST
+    manifest: dict = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+
     client = make_client()
     print(f"Generating audio for {len(vocab)} words → {audio_dir}/")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
-        results = list(pool.map(lambda e: process_entry(e, audio_dir, client), vocab))
+        results = list(pool.map(lambda e: process_entry(e, audio_dir, client, manifest), vocab))
 
-    generated = sum(results)
-    print(f"\n✅  Done — {generated}/{len(vocab)} audio files in {audio_dir}/")
+    for success, word, h in results:
+        if success and h is not None:
+            manifest[word] = h
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
+
+    generated = sum(1 for _, _, h in results if h is not None)
+    cached = sum(1 for ok, _, h in results if ok and h is None)
+    print(f"\n✅  Done — {generated} generated, {cached} cached  →  {audio_dir}/")
 
 
 if __name__ == "__main__":

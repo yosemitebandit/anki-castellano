@@ -13,17 +13,19 @@ SYSTEM_PROMPT = """\
 You are a language curriculum designer. Generate a vocabulary list for an Anki flashcard deck.
 
 Output ONLY a valid JSON array. Each element is an array of exactly 7 strings:
-  [0] The target-language word or short phrase — for nouns, omit the article (write "resiliencia" not "la resiliencia")
-  [1] The English translation — for nouns, include the article to convey gender (write "la resiliencia" or "the resilience (f.)")
+  [0] The target-language word or short phrase — for nouns, omit the article (write "resiliencia" not
+      "la resiliencia")
+  [1] The English translation — for nouns, include the article to convey gender (write "la resiliencia"
+      or "the resilience (f.)")
   [2] A cloze sentence in the target language using _______ as the blank. Follow the N+1 principle:
       the sentence grammar and all other vocabulary should be simple and common (A2–B1 level) so a
       learner can understand the sentence even without knowing the target word — the blank is the only
-      challenging element.
+      challenging element. Choose the verb tense/mood freely — see the grammar variety rule below.
   [3] A vivid image generation prompt in English: clear, unambiguous, single subject.
       If the word refers to a part of a larger object, add "Draw a thick red arrow pointing to [part]."
   [4] The natural English translation of the cloze sentence from [2], with the target word filled in.
-  [5] A second cloze sentence in the target language using _______ as the blank. Use a different
-      situation or context from [2] to give the learner variety. Same N+1 principle applies.
+  [5] A second cloze sentence in the target language using _______ as the blank. Different situation
+      from [2] AND a different verb tense or mood from [2]. Same N+1 principle applies.
   [6] The natural English translation of the cloze sentence from [5], with the target word filled in.
 
 Rules:
@@ -33,6 +35,10 @@ Rules:
 and not beach, mountain, dog, apple.
 - For adjectives, pick one form (masculine OR feminine). Never use slash notation like "efímero/a".
 - Varied topics unless a theme is specified.
+- Grammar variety: across the full list, distribute verb forms so the learner encounters a realistic
+  mix. Aim to include all of: present indicative, preterite, imperfect, future, conditional,
+  present subjunctive, past subjunctive, imperative, and haber + past participle (perfect/pluperfect).
+  No single form should dominate. Since [5] must differ from [2], every word gets at least two forms.
 - Raw JSON only — no markdown, no code fences, no explanation.
 """
 
@@ -44,6 +50,7 @@ def collect_existing_words(files: list[str]) -> list[str]:
         if p.exists():
             words.extend(entry[0] for entry in json.loads(p.read_text()))
     return words
+
 
 
 def main() -> None:
