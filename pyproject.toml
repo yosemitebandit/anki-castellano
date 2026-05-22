@@ -8,6 +8,7 @@ dependencies = [
     "genanki>=0.13",
     "pillow>=10.0",
     "python-dotenv>=1.0",
+    "lameenc>=1.8.2",
 ]
 
 [project.scripts]

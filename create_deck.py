@@ -157,7 +157,7 @@ def main() -> None:
         else:
             img_field = ""
 
-        audio_path = audio_dir / f"{stem(word)}.wav"
+        audio_path = audio_dir / f"{stem(word)}.mp3"
         if audio_path.exists():
             audio_field = f"[sound:{audio_path.name}]"
             media_files.append(str(audio_path))
@@ -169,6 +169,7 @@ def main() -> None:
             model=model,
             fields=[word, translation, sentence, sentence_full, sentence_en,
                     sentence2, sentence_full2, sentence_en2, audio_field, img_field],
+            guid=genanki.guid_for(MODEL_ID, word),
         ))
 
     pkg = genanki.Package(deck)

@@ -9,8 +9,9 @@ import random
 import re
 import sys
 import time
-import wave
 from pathlib import Path
+
+import lameenc
 
 from _lib import load_vocab, make_client
 from google.genai import types
@@ -30,12 +31,13 @@ def word_to_filename(word: str) -> str:
     return word.lower().replace(" ", "_").replace("/", "_")
 
 
-def save_wav(path: Path, pcm: bytes) -> None:
-    with wave.open(str(path), "wb") as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
-        wf.setframerate(24000)
-        wf.writeframes(pcm)
+def save_mp3(path: Path, pcm: bytes) -> None:
+    encoder = lameenc.Encoder()
+    encoder.set_bit_rate(128)
+    encoder.set_in_sample_rate(24000)
+    encoder.set_channels(1)
+    encoder.set_quality(2)
+    path.write_bytes(encoder.encode(pcm) + encoder.flush())
 
 
 def sentence_hash(sentence: str) -> str:
@@ -83,7 +85,7 @@ def process_entry(entry: list, audio_dir: Path, client, manifest: dict) -> tuple
 
     sentence_full2 = sentence2.replace("_______", word)
     h = sentence_hash(sentence_full2)
-    path = audio_dir / f"{word_to_filename(word)}.wav"
+    path = audio_dir / f"{word_to_filename(word)}.mp3"
 
     if path.exists() and manifest.get(word) == h:
         print(f"  ♻   Cached: {word}")
@@ -92,7 +94,7 @@ def process_entry(entry: list, audio_dir: Path, client, manifest: dict) -> tuple
     print(f"  🔊  Generating: {word}")
     pcm = generate_audio(sentence_full2, client)
     if pcm:
-        save_wav(path, pcm)
+        save_mp3(path, pcm)
         return True, word, h
     return False, word, None
 

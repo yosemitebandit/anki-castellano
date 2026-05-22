@@ -33,8 +33,6 @@ uv run create-deck sports.json --deck-name "Castellano: Sports"
 
 skip step 2 and/or 3 to omit images or audio and avoid those API costs.
 
-audio caches are keyed by sentence content — if a word's sentence changes after regenerating vocab, the audio is automatically regenerated on the next `uv run audio` run.
-
 `create-deck` defaults the output filename and deck name from the vocab file
 (`sports.json` → `sports.apkg`, deck name `Sports`).
 
@@ -42,7 +40,6 @@ audio caches are keyed by sentence content — if a word's sentence changes afte
 ### avoiding repeats across decks
 
 ```bash
-uv run wordlist --topic "music" --count 64 music.json --exclude sports.json
-uv run wordlist --count 64 batch3.json --exclude batch1.json batch2.json
 uv run wordlist --topic "sports" --count 32 sports.json --append
+uv run wordlist --count 64 batch3.json --exclude batch1.json batch2.json
 ```
