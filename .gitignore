@@ -1,5 +1,6 @@
 .env
 images/
+audio/
 *.apkg
 *.json
 __pycache__/

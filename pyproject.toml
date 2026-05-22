@@ -13,6 +13,7 @@ dependencies = [
 [project.scripts]
 wordlist    = "wordlist:main"
 images      = "images:main"
+audio       = "audio:main"
 create-deck = "create_deck:main"
 
 [tool.hatch.build.targets.wheel]
@@ -24,6 +25,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "pyright>=1.1.409",
     "ruff>=0.15.12",
 ]
 

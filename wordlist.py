@@ -12,7 +12,7 @@ from google.genai import types
 SYSTEM_PROMPT = """\
 You are a language curriculum designer. Generate a vocabulary list for an Anki flashcard deck.
 
-Output ONLY a valid JSON array. Each element is an array of exactly 5 strings:
+Output ONLY a valid JSON array. Each element is an array of exactly 7 strings:
   [0] The target-language word or short phrase — for nouns, omit the article (write "resiliencia" not "la resiliencia")
   [1] The English translation — for nouns, include the article to convey gender (write "la resiliencia" or "the resilience (f.)")
   [2] A cloze sentence in the target language using _______ as the blank. Follow the N+1 principle:
@@ -22,6 +22,9 @@ Output ONLY a valid JSON array. Each element is an array of exactly 5 strings:
   [3] A vivid image generation prompt in English: clear, unambiguous, single subject.
       If the word refers to a part of a larger object, add "Draw a thick red arrow pointing to [part]."
   [4] The natural English translation of the cloze sentence from [2], with the target word filled in.
+  [5] A second cloze sentence in the target language using _______ as the blank. Use a different
+      situation or context from [2] to give the learner variety. Same N+1 principle applies.
+  [6] The natural English translation of the cloze sentence from [5], with the target word filled in.
 
 Rules:
 - No duplicates.

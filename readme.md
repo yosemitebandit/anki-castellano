@@ -11,17 +11,27 @@ uv sync
 ```
 
 
+### dev
+
+```bash
+uv run ruff check .   # lint
+uv run ruff format .  # format
+uv run pyright        # type check
+```
+
+
 ### usage
 
-three steps, each optional after the first:
+four steps, each optional after the first:
 
 ```bash
 uv run wordlist --topic "sports" --count 64 sports.json
 uv run images sports.json
+uv run audio sports.json
 uv run create-deck sports.json --deck-name "Castellano: Sports"
 ```
 
-skip step 2 for a cloze-only deck with no images and no image API cost.
+skip step 2 and/or 3 to omit images or audio and avoid those API costs.
 
 `create-deck` defaults the output filename and deck name from the vocab file
 (`sports.json` → `sports.apkg`, deck name `Sports`).
