@@ -6,7 +6,9 @@ import concurrent.futures
 import hashlib
 import json
 import random
+import re
 import sys
+import time
 import wave
 from pathlib import Path
 
@@ -40,25 +42,35 @@ def sentence_hash(sentence: str) -> str:
     return hashlib.sha256(sentence.encode()).hexdigest()[:16]
 
 
-def generate_audio(sentence: str, client) -> bytes | None:
+def generate_audio(sentence: str, client, max_retries: int = 5) -> bytes | None:
     voice = random.choice(VOICES)
-    try:
-        response = client.models.generate_content(
-            model="gemini-3.1-flash-tts-preview",
-            contents=sentence,
-            config=types.GenerateContentConfig(
-                response_modalities=["AUDIO"],
-                speech_config=types.SpeechConfig(
-                    voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)
-                    )
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.1-flash-tts-preview",
+                contents=sentence,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice)
+                        )
+                    ),
                 ),
-            ),
-        )
-        return response.candidates[0].content.parts[0].inline_data.data
-    except Exception as exc:
-        print(f"  ❌  {exc}", file=sys.stderr)
-        return None
+            )
+            return response.candidates[0].content.parts[0].inline_data.data
+        except Exception as exc:
+            msg = str(exc)
+            if "429" in msg or "RESOURCE_EXHAUSTED" in msg:
+                match = re.search(r"retryDelay.*?(\d+)s", msg)
+                delay = int(match.group(1)) + 5 if match else 65
+                print(f"  ⏳  Rate limited — retrying in {delay}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(delay)
+            else:
+                print(f"  ❌  {exc}", file=sys.stderr)
+                return None
+    print(f"  ❌  Failed after {max_retries} retries", file=sys.stderr)
+    return None
 
 
 def process_entry(entry: list, audio_dir: Path, client, manifest: dict) -> tuple[bool, str, str | None]:
