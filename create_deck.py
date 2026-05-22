@@ -13,6 +13,7 @@ CARD_CSS = """
 .card        { font-family: -apple-system, sans-serif; text-align: center; padding: 20px; }
 
 .word        { font-size: 32px; font-weight: bold; margin: 10px 0; color: #1d4ed8; }
+.word-en     { font-size: 32px; font-weight: bold; margin: 10px 0; }
 .translation { font-size: 18px; color: #6b7280; margin-top: 8px; }
 .sentence-es { font-size: 20px; line-height: 1.6; margin-top: 10px; }
 .sentence-en { font-size: 20px; line-height: 1.5; margin-top: 10px; font-style: italic; }
@@ -55,7 +56,7 @@ def make_model() -> genanki.Model:
         templates=[
             {
                 "name": "EN → ES",
-                "qfmt": '<div class="word">{{English}}</div>',
+                "qfmt": '<div class="word-en">{{English}}</div>',
                 "afmt": (
                     '<div class="word">{{Spanish}}</div>'
                     "<hr>"
