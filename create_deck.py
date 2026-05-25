@@ -42,16 +42,16 @@ def make_model() -> genanki.Model:
         MODEL_ID,
         "Vocab Multi",
         fields=[
-            {"name": "Spanish"},       # the target word/phrase
-            {"name": "English"},       # translation, with article hint for nouns
-            {"name": "Sentence"},      # first example sentence with _______
+            {"name": "Spanish"},  # the target word/phrase
+            {"name": "English"},  # translation, with article hint for nouns
+            {"name": "Sentence"},  # first example sentence with _______
             {"name": "SentenceFull"},  # first sentence with the word filled in
-            {"name": "SentenceEN"},    # English translation of first sentence
-            {"name": "Sentence2"},     # second example sentence with _______
-            {"name": "SentenceFull2"}, # second sentence with the word filled in
-            {"name": "SentenceEN2"},   # English translation of second sentence
-            {"name": "Audio2"},        # [sound:word.wav] for second sentence, or empty
-            {"name": "Image"},         # <img> tag, or empty string
+            {"name": "SentenceEN"},  # English translation of first sentence
+            {"name": "Sentence2"},  # second example sentence with _______
+            {"name": "SentenceFull2"},  # second sentence with the word filled in
+            {"name": "SentenceEN2"},  # English translation of second sentence
+            {"name": "Audio2"},  # [sound:word.wav] for second sentence, or empty
+            {"name": "Image"},  # <img> tag, or empty string
         ],
         templates=[
             {
@@ -165,12 +165,24 @@ def main() -> None:
         else:
             audio_field = ""
 
-        deck.add_note(genanki.Note(
-            model=model,
-            fields=[word, translation, sentence, sentence_full, sentence_en,
-                    sentence2, sentence_full2, sentence_en2, audio_field, img_field],
-            guid=genanki.guid_for(MODEL_ID, word),
-        ))
+        deck.add_note(
+            genanki.Note(
+                model=model,
+                fields=[
+                    word,
+                    translation,
+                    sentence,
+                    sentence_full,
+                    sentence_en,
+                    sentence2,
+                    sentence_full2,
+                    sentence_en2,
+                    audio_field,
+                    img_field,
+                ],
+                guid=genanki.guid_for(MODEL_ID, word),
+            )
+        )
 
     pkg = genanki.Package(deck)
     pkg.media_files = media_files
@@ -178,8 +190,10 @@ def main() -> None:
 
     # cards per note: 3 base (EN→ES, Sentence→ES, ES→EN) + 1 if image (Image→ES)
     total_cards = len(vocab) * 3 + with_images
-    print(f"✅  {output}  —  '{deck_name}'  —  {len(vocab)} notes → {total_cards} cards"
-          f"  ({with_images} with images, {with_audio} with audio)")
+    print(
+        f"✅  {output}  —  '{deck_name}'  —  {len(vocab)} notes → {total_cards} cards"
+        f"  ({with_images} with images, {with_audio} with audio)"
+    )
 
 
 if __name__ == "__main__":
