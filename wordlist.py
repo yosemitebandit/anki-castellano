@@ -15,8 +15,7 @@ You are a language curriculum designer. Generate a vocabulary list for an Anki f
 Output ONLY a valid JSON array. Each element is an array of exactly 7 strings:
   [0] The target-language word or short phrase — for nouns, omit the article (write "resiliencia" not
       "la resiliencia")
-  [1] The English translation — for nouns, include the article to convey gender (write "la resiliencia"
-      or "the resilience (f.)")
+  [1] The English translation
   [2] A cloze sentence in the target language using _______ as the blank. Follow the N+1 principle:
       the sentence grammar and all other vocabulary should be simple and common (A2–B1 level) so a
       learner can understand the sentence even without knowing the target word — the blank is the only
@@ -50,7 +49,6 @@ def collect_existing_words(files: list[str]) -> list[str]:
         if p.exists():
             words.extend(entry[0] for entry in json.loads(p.read_text()))
     return words
-
 
 
 def main() -> None:
