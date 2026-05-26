@@ -58,8 +58,9 @@ def make_model() -> genanki.Model:
                 "name": "EN → ES",
                 "qfmt": '<div class="word-en">{{English}}</div>',
                 "afmt": (
-                    '<div class="word">{{Spanish}}</div>'
+                    '<div class="word-en">{{English}}</div>'
                     "<hr>"
+                    '<div class="word">{{Spanish}}</div>'
                     "{{#Image}}<div class='img-wrap'>{{Image}}</div>{{/Image}}"
                     '<div class="sentence-es">{{Sentence}}</div>'
                     '<div class="sentence-en">{{SentenceEN}}</div>'
